@@ -3,8 +3,8 @@ import mongodb as db
 import pandas as pd
 import json
 from datetime import datetime
-from bar_plot import bar_plot, bar_plot_fn
-from line_plot import line_plot
+from bar_plot import bar_plot
+#from line_plot import line_plot
 
 """--------Collect the document------------"""
 
@@ -36,8 +36,8 @@ def run_query():
     data_list = list(docs)
 
     # Handle datetime format -> iso format
-    for data in data_list:
-        data['date'] = data['date'].isoformat()
+    # for data in data_list:
+    #     data['date'] = data['date'].isoformat()
 
     # convert to json type
     data_json = json.dumps(data_list)
@@ -62,8 +62,8 @@ with gr.Blocks() as dashboard:
         btn.click(run_query, outputs=gr.DataFrame(run_query))
     with gr.Tab("Bar Plot"):
         bar_plot.render()
-    with gr.Tab("Line Plot"):
-        line_plot.render()
+    # with gr.Tab("Line Plot"):
+    #     line_plot.render()
     
 if __name__ == "__main__":
     dashboard.queue().launch()

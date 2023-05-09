@@ -5,76 +5,85 @@ import json
 from datetime import datetime
 import copy
 
-"""---------Get data from database---------"""
+# """---------Get data from database---------"""
 
-query = {'type': {'$ne': 'reg'}}
-projection = {"_id": 0}         # 0 mean exclude _id from query result
-docs = db.MemberColl.find(query, projection)
+# query = {'type': {'$ne': 'reg'}}
+# projection = {"_id": 0}         # 0 mean exclude _id from query result
+# docs = db.MemberColl.find(query, projection)
 
-data_list = list(docs)
-
-
-"""-------------- Handle: datetime format -> iso format--------------------"""
-for data in data_list:
-    data['date'] = data['date'].isoformat()
+# data_list = list(docs)
 
 
-
-""" Convert to json format """
-#print(data_list)
-data_json = json.dumps(data_list)
-data = json.loads(data_json)
+# """-------------- Handle: datetime format -> iso format--------------------"""
+# for data in data_list:
+#     data['date'] = data['date'].isoformat()
 
 
 
-"""---------------- Get day in Date string -------------------"""
-def getDay(date):
-    date_obj = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
-    day = date_obj.day
-    return str(day)
+# """ Convert to json format """
+# #print(data_list)
+# data_json = json.dumps(data_list)
+# data = json.loads(data_json)
 
-data2 = copy.deepcopy(data)
+
+
+# """---------------- Get day in Date string -------------------"""
+# def getDay(date):
+#     date_obj = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
+#     day = date_obj.day
+#     return str(day)
+
+# data2 = copy.deepcopy(data)
     
-for obj in data2:
-    obj['date'] = getDay(obj['date'])
+# for obj in data2:
+#     obj['date'] = getDay(obj['date'])
 
-# print(data2)
-# print(data)
+# # print(data2)
+# # print(data)
 
 
 
-"""--------------Create data for graph-----------------"""
+# """--------------Create data for graph-----------------"""
 
-graph_data = [{'type': data2[0]['type'], 'date': data2[0]['date'], 'count': 0}]
+# graph_data = [{'type': data2[0]['type'], 'date': data2[0]['date'], 'count': 0}]
 
-for i in range(1,len(data2)):
-    j = 0
-    while (j < len(graph_data)):
-        if data2[i]['date'] == graph_data[j]['date'] and data2[i]['type'] == graph_data[j]['type']:
-            break
-        j += 1
-    if j != len(graph_data): continue
-    else: graph_data.append({'type': data2[i]['type'], 'date': data2[i]['date'], 'count': 0})
+# for i in range(1,len(data2)):
+#     j = 0
+#     while (j < len(graph_data)):
+#         if data2[i]['date'] == graph_data[j]['date'] and data2[i]['type'] == graph_data[j]['type']:
+#             break
+#         j += 1
+#     if j != len(graph_data): continue
+#     else: graph_data.append({'type': data2[i]['type'], 'date': data2[i]['date'], 'count': 0})
 
-for i in range(len(data2)):
-    if data2[i]['type'] == 'in':
-        for j in range(len(graph_data)):
-            if graph_data[j]['type'] == 'in' and graph_data[j]['date'] == data2[i]['date']:
-                graph_data[j]['count'] += 1
-                break
-        continue
-    else:
-        for j in range(len(graph_data)):
-            if graph_data[j]['type'] == 'out' and graph_data[j]['date'] == data2[i]['date']:
-                graph_data[j]['count'] += 1
-                break
-        continue
+# for i in range(len(data2)):
+#     if data2[i]['type'] == 'in':
+#         for j in range(len(graph_data)):
+#             if graph_data[j]['type'] == 'in' and graph_data[j]['date'] == data2[i]['date']:
+#                 graph_data[j]['count'] += 1
+#                 break
+#         continue
+#     else:
+#         for j in range(len(graph_data)):
+#             if graph_data[j]['type'] == 'out' and graph_data[j]['date'] == data2[i]['date']:
+#                 graph_data[j]['count'] += 1
+#                 break
+#         continue
 
 # print(data2)
 # print(graph_data)
 # print(len(graph_data))
 # print(count)
 
+temp = db.MemberColl.aggregate([
+    {"$match": { 'type': {'$ne': 'reg'}}},
+    {"$group": {"_id": {"ID": "$ID", "type": "$type", "date": "$date"}, "count": {"$sum": 1}}},
+    {"$project": {"ID": "$_id.ID", "type": "$_id.type", "date": "$_id.date", "count": 1, "_id": 0}}
+])
+
+#print(list(temp_list))
+
+graph_data = list(temp)
 
 """--------------Interface for bar_plot dashboard---------------"""
 
@@ -83,7 +92,7 @@ df_graph = pd.DataFrame(graph_data)
 def bar_plot_fn():
     return gr.BarPlot.update(
             df_graph,
-            x="date",
+            x="ID",
             y="count",
             color="type",
             #color_legend_position="bottom",
