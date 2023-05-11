@@ -8,9 +8,9 @@ from bar_plot import bar_plot
 
 """--------Collect the document------------"""
 
-query = {'type': {'$ne': 'reg'}}
-projection = {"_id": 0}         # 0 mean exclude _id from query result
-docs = db.MemberColl.find(query, projection)
+# query = {'type': {'$ne': 'reg'}}
+# projection = {"_id": 0}         # 0 mean exclude _id from query result
+# docs = db.MemberColl.find(query, projection)
 
 
 # data_list = [{'ID': '111', 'name': 'ElonMusk', 'status': 1, 'type': 'in', 'date': '2023, 4, 20, 21, 37, 18, 716000'}, 
