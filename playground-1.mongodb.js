@@ -1,3 +1,5 @@
+// Example documents for mongodb
+
 /* global use, db */
 // MongoDB Playground
 // To disable this template go to Settings | MongoDB | Use Default Template For Playground.
