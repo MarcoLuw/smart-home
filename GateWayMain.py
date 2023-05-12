@@ -11,8 +11,8 @@ ser = None
 
 
 #1.-----config login Ada
-AIO_USERNAME = "jackwrion12345"
-AIO_KEY = "aio_jgfr16Jb92VLez2J9XJ1ooVLxTsq"
+AIO_USERNAME = ""
+AIO_KEY = ""
 
 
 #2.-----Connect Microbit
